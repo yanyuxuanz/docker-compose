@@ -1,0 +1,600 @@
+version: '3.8'
+services:
+  
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    hostname: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ${CODE_PATH}:/var/www:rw
+      - ./nginx/logs:/var/log/nginx:rw
+      - ./nginx/conf:/etc/nginx
+    environment:
+      - TZ=Asia/Shanghai
+    restart: always
+    networks:
+      - devops
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  php:
+    image: jormin/php:7.3
+    container_name: php
+    hostname: php
+    # expose:
+    #   - 9000
+    ports:
+      - "9000:9000"
+      - "8888:8888"
+    volumes:
+      - ${CODE_PATH}:/var/www:rw
+      - ./php/conf:/usr/local/etc/php
+      - ./php/logs:/var/log/php
+    environment:
+      - TZ=Asia/Shanghai
+    restart: always
+    networks:
+      - devops
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  mysql:
+    image: library/mysql:5.7.13
+    container_name: mysql
+    hostname: mysql
+    ports:
+      - "${MYSQL_PORT}:3306"
+    volumes:
+      - ./mysql/conf:/etc/mysql
+      - ./mysql/data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    restart: always
+    networks:
+      - devops
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  redis:
+    image: redis:6.0.7
+    container_name: redis
+    hostname: redis
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - ./redis/conf:/etc/redis
+      - ./redis/data:/data
+    command: redis-server /etc/redis/redis.conf
+    restart: always
+    networks:
+      - devops
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  redisinsight:
+    image: redislabs/redisinsight:latest
+    container_name: redisinsight
+    hostname: redisinsight
+    ports:
+      - "${REDIS_INSIGHT_PORT}:8001"
+    volumes:
+      - ./redisinsight:/db
+    restart: always
+    networks:
+      - devops
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  mongo:
+    image: mongo:5.0.2
+    container_name: mongo
+    hostname: mongo
+    ports:
+      - "${MONGO_PORT}:27017"
+    environment:
+      TZ: Asia/Shanghai
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+    volumes:
+      - ./mongo/conf:/etc/mongo
+      - ./mongo/data/db:/data/db
+      - ./mongo/data/configdb:/data/configdb
+      - ./mongo/logs:/var/log/mongodb
+    command: mongod -f /etc/mongo/mongod.conf
+    restart: always
+    networks:
+      - devops
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  mongo-express:
+    image: mongo-express:0.54
+    container_name: mongo-express
+    hostname: mongo-express
+    ports:
+      - "${MONGO_EXPRESS_PORT}:8081"
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_EXPRESS_USERNAME}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_EXPRESS_PASSWORD}
+      ME_CONFIG_MONGODB_SERVER: "mongo"
+      ME_CONFIG_MONGODB_PORT: ${MONGO_PORT}
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_ROOT_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_ROOT_PASSWORD}
+    restart: always
+    depends_on:
+      - mongo
+    networks:
+      - devops
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  elasticsearch:
+    image: elasticsearch:${ELK_VERSION}
+    container_name: elasticsearch
+    hostname: elasticsearch
+    restart: always
+    volumes:
+      - ./elastic/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./elastic/elasticsearch/data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      ES_JAVA_OPTS: "-Xmx1g -Xms1g"
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      TZ: Asia/Shanghai
+      discovery.type: single-node
+    networks:
+      - devops
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  kibana:
+    image: kibana:${ELK_VERSION}
+    container_name: kibana
+    hostname: kibana
+    restart: always
+    volumes:
+      - ./elastic/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
+    ports:
+      - "5601:5601"
+    environment:
+      TZ: Asia/Shanghai
+    networks:
+      - devops
+    depends_on:
+      - elasticsearch
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  logstash:
+    image: logstash:${ELK_VERSION}
+    container_name: logstash
+    hostname: logstash
+    restart: always
+    volumes:
+      - ./elastic/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./elastic/logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml
+      - ./elastic/logstash/pipeline:/usr/share/logstash/pipeline
+      - ${GEO_IP_PATH}:/usr/share/GeoIP
+      - ${LOGS_PATH}:/var/log
+    ports:
+      - "5044:5044"
+      - "5000:5000/tcp"
+      - "5000:5000/udp"
+      - "9600:9600"
+    environment:
+      TZ: Asia/Shanghai
+    networks:
+      - devops
+    depends_on:
+      - elasticsearch
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:${ELK_VERSION}
+    container_name: filebeat
+    hostname: filebeat
+    restart: always
+    command: "filebeat -e -d *"
+    volumes:
+      - ./elastic/filebeat/config/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ${LOGS_PATH}:/var/log
+    environment:
+      TZ: Asia/Shanghai
+    depends_on:
+      - elasticsearch
+      - kibana
+    networks:
+      - devops
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  gitlab:
+    image: 'gitlab/gitlab-ce:latest'
+    restart: always
+    container_name: gitlab
+    hostname: gitlab
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'https://gitlab.wcxst.com:443'
+        gitlab_rails['gitlab_shell_ssh_port'] = 2224
+        gitlab_rails['time_zone'] = 'Asia/Shanghai'
+        gitlab_rails['gitlab_email_from'] = 'gitlab_wcxst@163.com'
+        gitlab_rails['gitlab_email_display_name'] = 'GitLab Administrator'
+        gitlab_rails['gitlab_email_reply_to'] = 'gitlab_wcxst@163.com'
+        gitlab_rails['backup_keep_time'] = 14515200
+        gitlab_rails['smtp_enable'] = true
+        gitlab_rails['smtp_address'] = "smtp.163.com"
+        gitlab_rails['smtp_port'] = 25
+        gitlab_rails['smtp_user_name'] = "gitlab_wcxst@163.com"
+        gitlab_rails['smtp_password'] = "RVVOEQXNINMSJLCP"
+        gitlab_rails['smtp_domain'] = "163.com"
+        gitlab_rails['smtp_authentication'] = "login"
+        gitlab_rails['smtp_enable_starttls_auto'] = true
+        nginx['listen_port'] = 443
+        nginx['redirect_http_to_https'] = true
+        nginx['logrotate_frequency'] = "weekly"
+        nginx['logrotate_rotate'] = 52
+        nginx['logrotate_compress'] = "compress"
+        nginx['logrotate_method'] = "copytruncate"
+        nginx['logrotate_delaycompress'] = "delaycompress"
+        nginx['ssl'] = "on"
+        letsencrypt['enable'] = true
+    ports:
+      - '80:80'
+      - '443:443'
+      - '2224:22'
+    volumes:
+      - ./gitlab/config:/etc/gitlab
+      - ./gitlab/logs:/var/log/gitlab
+      - ./gitlab/data:/var/opt/gitlab
+    networks:
+      - devops
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  gitlab-runner:
+    image: 'gitlab/gitlab-runner:latest'
+    container_name: gitlab-runner
+    hostname: gitlab-runner
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./gitlab/config:/etc/gitlab-runner
+    restart: unless-stopped
+    networks:
+      - devops
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    hostname: grafana
+    restart: always
+    environment:
+      TZ: 'Asia/Shanghai'
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/conf:/etc/grafana
+      - ./grafana/data:/var/lib/grafana
+    networks:
+      - devops
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  jenkins:
+    image: 'jenkinsci/blueocean:latest'
+    restart: always
+    container_name: jenkins
+    hostname: jenkins
+    privileged: true
+    user: root
+    environment:
+      TZ: 'Asia/Shanghai'
+    ports:
+      - '63190:8080'
+      - '50000:50000'
+    volumes:
+      - ./jenkins:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/local/bin/docker:/usr/local/bin/docker
+    networks:
+      - devops
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  zookeeper1:
+    image: zookeeper:3.7.0
+    restart: always
+    container_name: zookeeper1
+    hostname: zookeeper1
+    ports:
+      - 2181:2181
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=0.0.0.0:2888:3888;2181 server.2=zookeeper2:2888:3888;2181 server.3=zookeeper3:2888:3888;2181
+    volumes:
+      - ./zookeeper/zookeeper1/data:/data
+      - ./zookeeper/zookeeper1/datalog:/datalog
+      - ./zookeeper/zookeeper1/logs:/logs
+    networks:
+      - devops
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  zookeeper2:
+    image: zookeeper:3.7.0
+    restart: always
+    container_name: zookeeper2
+    hostname: zookeeper2
+    ports:
+      - 2182:2181
+    environment:
+      ZOO_MY_ID: 2
+      ZOO_SERVERS: server.1=zookeeper1:2888:3888;2181 server.2=0.0.0.0:2888:3888;2181 server.3=zookeeper3:2888:3888;2181
+    volumes:
+      - ./zookeeper/zookeeper2/data:/data
+      - ./zookeeper/zookeeper2/datalog:/datalog
+      - ./zookeeper/zookeeper2/logs:/logs
+    networks:
+      - devops
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  zookeeper3:
+    image: zookeeper:3.7.0
+    restart: always
+    container_name: zookeeper3
+    hostname: zookeeper3
+    ports:
+      - 2183:2181
+    environment:
+      ZOO_MY_ID: 3
+      ZOO_SERVERS: server.1=zookeeper1:2888:3888;2181 server.2=zookeeper2:2888:3888;2181 server.3=0.0.0.0:2888:3888;2181
+    volumes:
+      - ./zookeeper/zookeeper3/data:/data
+      - ./zookeeper/zookeeper3/datalog:/datalog
+      - ./zookeeper/zookeeper3/logs:/logs
+    networks:
+      - devops
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  kafka1:
+    image: bitnami/kafka:latest
+    restart: always
+    container_name: kafka1
+    hostname: kafka1
+    ports:
+      - 9091:9091
+      - 29091:29091
+    environment:
+      - KAFKA_BROKER_ID=1
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=EXTERNAL://:29091,CLIENT://:9091
+      - KAFKA_CFG_ADVERTISED_LISTENERS=EXTERNAL://127.0.0.1:29091,CLIENT://kafka1:9091
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=${ZOOKEEPER_SERVERS}
+    volumes:
+      - ./kafka/kafka1/data:/bitnami/kafka/data
+      - ./kafka/kafka1/logs:/bitnami/kafka/logs
+      - ./kafka/kafka1/config:/opt/bitnami/kafka/config
+    networks:
+      - devops
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  kafka2:
+    image: bitnami/kafka:latest
+    restart: always
+    container_name: kafka2
+    hostname: kafka2
+    ports:
+      - 9092:9092
+      - 29092:29092
+    environment:
+      - KAFKA_BROKER_ID=2
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=EXTERNAL://:29092,CLIENT://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=EXTERNAL://127.0.0.1:29092,CLIENT://kafka2:9092
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=${ZOOKEEPER_SERVERS}
+    volumes:
+      - ./kafka/kafka2/data:/bitnami/kafka/data
+      - ./kafka/kafka2/logs:/bitnami/kafka/logs
+      - ./kafka/kafka2/config:/opt/bitnami/kafka/config
+    networks:
+    networks:
+      - devops
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  kafka3:
+    image: bitnami/kafka:latest
+    restart: always
+    container_name: kafka3
+    hostname: kafka3
+    ports:
+      - 9093:9093
+      - 29093:29093
+    environment:
+      - KAFKA_BROKER_ID=3
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=EXTERNAL://:29093,CLIENT://kafka3:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=EXTERNAL://127.0.0.1:29093,CLIENT://kafka3:9093
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=${ZOOKEEPER_SERVERS}
+    volumes:
+      - ./kafka/kafka3/data:/bitnami/kafka/data
+      - ./kafka/kafka3/logs:/bitnami/kafka/logs
+      - ./kafka/kafka3/config:/opt/bitnami/kafka/config
+    networks:
+    networks:
+      - devops
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  canal-admin:
+    image: 'canal/canal-admin:latest'
+    container_name: canal-admin
+    hostname: canal-admin
+    environment:
+      TZ: 'Asia/Shanghai'
+      server.port: 8089
+      canal.adminUser: ${CANAL_ADMIN_USERNAME}
+      canal.adminPasswd: ${CANAL_ADMIN_PASSWORD}
+      spring.datasource.address: mysql:3306
+      spring.datasource.database: ${CANAL_ADMIN_DB}
+      spring.datasource.username: ${CANAL_ADMIN_DB_USERNAME}
+      spring.datasource.password: ${CANAL_ADMIN_DB_PASSWORD}
+    ports:
+      - '8089:8089'
+    volumes:
+      - ./canal/canal-admin/conf:/home/admin/canal-admin/conf
+      - ./canal/canal-admin/logs:/home/admin/canal-admin/logs
+    networks:
+      - devops
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  canal-server1:
+    image: 'canal/canal-server:latest'
+    container_name: canal-server1
+    hostname: canal-server1
+    environment:
+      TZ: 'Asia/Shanghai'
+      canal.admin.manager: canal-admin:8089
+      canal.admin.port: 11110
+      canal.admin.user: ${CANAL_ADMIN_USERNAME}
+      canal.admin.passwd: ${CANAL_ADMIN_PASSWORD}
+      canal.admin.register.cluster: cluster
+      canal.admin.register.auto: true
+    ports:
+      - '11110-11112:11110-11112'
+      - '19100:9100'
+    volumes:
+      - ./canal/canal-server1/conf:/home/admin/canal-server/conf
+      - ./canal/canal-server1/logs:/home/admin/canal-server/logs
+    networks:
+      - devops
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  canal-server2:
+    image: 'canal/canal-server:latest'
+    container_name: canal-server2
+    hostname: canal-server2
+    environment:
+      TZ: 'Asia/Shanghai'
+      canal.admin.manager: canal-admin:8089
+      canal.admin.port: 11110
+      canal.admin.user: ${CANAL_ADMIN_USERNAME}
+      canal.admin.passwd: ${CANAL_ADMIN_PASSWORD}
+      canal.admin.register.cluster: cluster
+      canal.admin.register.auto: true
+    ports:
+      - '21110:11110'
+      - '21111:11111'
+      - '21112:11112'
+      - '29100:9100'
+    volumes:
+      - ./canal/canal-server2/conf:/home/admin/canal-server/conf
+      - ./canal/canal-server2/logs:/home/admin/canal-server/logs
+    networks:
+      - devops
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  prometheus:
+    image: 'prom/prometheus:latest'
+    container_name: prometheus
+    hostname: prometheus
+    environment:
+      TZ: 'Asia/Shanghai'
+    ports:
+      - '19090:9090'
+    volumes:
+      - ./prometheus/conf/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - devops
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  rabbitmq1:
+    image: 'rabbitmq:${RABBITMQ_IMAGE_TAG}'
+    container_name: rabbitmq1
+    hostname: rabbitmq1
+    environment:
+      TZ: 'Asia/Shanghai'
+      RABBITMQ_NODENAME: rabbitmq1
+      RABBITMQ_ERLANG_COOKIE: ${RABBITMQ_ERLANG_COOKIE}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    ports:
+      - '15671:15672'
+      - '5671:5672'
+    volumes:
+      - ./rabbitmq/rabbitmq1:/var/lib/rabbitmq
+    networks:
+      - devops
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  rabbitmq2:
+    image: 'rabbitmq:${RABBITMQ_IMAGE_TAG}'
+    container_name: rabbitmq2
+    hostname: rabbitmq2
+    environment:
+      TZ: 'Asia/Shanghai'
+      RABBITMQ_NODENAME: rabbitmq2
+      RABBITMQ_ERLANG_COOKIE: ${RABBITMQ_ERLANG_COOKIE}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    ports:
+      - '15672:15672'
+      - '5672:5672'
+    volumes:
+      - ./rabbitmq/rabbitmq2:/var/lib/rabbitmq
+    networks:
+      - devops
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  rabbitmq3:
+    image: 'rabbitmq:${RABBITMQ_IMAGE_TAG}'
+    container_name: rabbitmq3
+    hostname: rabbitmq3
+    environment:
+      TZ: 'Asia/Shanghai'
+      RABBITMQ_NODENAME: rabbitmq3
+      RABBITMQ_ERLANG_COOKIE: ${RABBITMQ_ERLANG_COOKIE}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    ports:
+      - '15673:15672'
+      - '5673:5672'
+    volumes:
+      - ./rabbitmq/rabbitmq3:/var/lib/rabbitmq
+    networks:
+      - devops
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  devops:
+    external: true

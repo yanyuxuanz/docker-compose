@@ -1,0 +1,98 @@
+2022-03-05 22:44:51.225 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## set default uncaught exception handler
+2022-03-05 22:44:51.303 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## load canal configurations
+2022-03-05 22:44:52.129 [main] ERROR com.alibaba.otter.canal.deployer.CanalLauncher - ## Something goes wrong when starting up the canal Server:
+com.alibaba.otter.canal.common.CanalException: load manager config failed.
+Caused by: com.alibaba.otter.canal.common.CanalException: requestGet for canal config error: auth :admin is failed
+2022-03-05 22:45:14.782 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## set default uncaught exception handler
+2022-03-05 22:45:14.842 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## load canal configurations
+2022-03-05 22:45:15.677 [main] ERROR com.alibaba.otter.canal.deployer.CanalLauncher - ## Something goes wrong when starting up the canal Server:
+com.alibaba.otter.canal.common.CanalException: load manager config failed.
+Caused by: com.alibaba.otter.canal.common.CanalException: requestGet for canal config error: auth :admin is failed
+2022-03-05 22:49:05.517 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## set default uncaught exception handler
+2022-03-05 22:49:05.591 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## load canal configurations
+2022-03-05 22:49:06.523 [main] ERROR com.alibaba.otter.canal.deployer.CanalLauncher - ## Something goes wrong when starting up the canal Server:
+com.alibaba.otter.canal.common.CanalException: load manager config failed.
+Caused by: com.alibaba.otter.canal.common.CanalException: requestGet for canal config error: auth :admin is failed
+2022-03-05 22:51:39.882 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## set default uncaught exception handler
+2022-03-05 22:51:39.942 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## load canal configurations
+2022-03-05 22:51:41.160 [main] ERROR com.alibaba.otter.canal.deployer.CanalLauncher - ## Something goes wrong when starting up the canal Server:
+com.alibaba.otter.canal.common.CanalException: load manager config failed.
+Caused by: com.alibaba.otter.canal.common.CanalException: requestGet for canal config error: auth :admin is failed
+2022-03-05 22:55:09.177 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## set default uncaught exception handler
+2022-03-05 22:55:09.240 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## load canal configurations
+2022-03-05 22:55:09.996 [main] ERROR com.alibaba.otter.canal.deployer.CanalLauncher - ## Something goes wrong when starting up the canal Server:
+com.alibaba.otter.canal.common.CanalException: load manager config failed.
+Caused by: com.alibaba.otter.canal.common.CanalException: requestGet for canal config error: auth :admin is failed
+2022-03-05 22:57:36.024 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## set default uncaught exception handler
+2022-03-05 22:57:36.323 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## load canal configurations
+2022-03-05 22:57:37.457 [main] ERROR com.alibaba.otter.canal.deployer.CanalLauncher - ## Something goes wrong when starting up the canal Server:
+com.alibaba.otter.canal.common.CanalException: load manager config failed.
+Caused by: com.alibaba.otter.canal.common.CanalException: requestGet for canal config error: canal.properties config is empty
+2022-03-05 22:59:58.798 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## set default uncaught exception handler
+2022-03-05 22:59:58.859 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## load canal configurations
+2022-03-05 22:59:59.693 [main] ERROR com.alibaba.otter.canal.deployer.CanalLauncher - ## Something goes wrong when starting up the canal Server:
+com.alibaba.otter.canal.common.CanalException: load manager config failed.
+Caused by: com.alibaba.otter.canal.common.CanalException: requestGet for canal config error: canal.properties config is empty
+2022-03-05 23:05:37.401 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## set default uncaught exception handler
+2022-03-05 23:05:37.572 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## load canal configurations
+2022-03-05 23:05:39.177 [main] ERROR com.alibaba.otter.canal.deployer.CanalLauncher - ## Something goes wrong when starting up the canal Server:
+com.alibaba.otter.canal.common.CanalException: load manager config failed.
+Caused by: com.alibaba.otter.canal.common.CanalException: requestGet for canal config error: canal.properties config is empty
+2022-03-05 23:08:08.765 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## set default uncaught exception handler
+2022-03-05 23:08:08.885 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## load canal configurations
+2022-03-05 23:08:10.235 [main] ERROR com.alibaba.otter.canal.deployer.CanalLauncher - ## Something goes wrong when starting up the canal Server:
+java.lang.NullPointerException: null
+	at com.alibaba.otter.canal.deployer.CanalStarter.start(CanalStarter.java:68) ~[canal.deployer-1.1.5.jar:na]
+	at com.alibaba.otter.canal.deployer.CanalLauncher.main(CanalLauncher.java:117) ~[canal.deployer-1.1.5.jar:na]
+2022-03-05 23:16:47.393 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## set default uncaught exception handler
+2022-03-05 23:16:47.463 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## load canal configurations
+2022-03-05 23:16:48.501 [main] ERROR com.alibaba.otter.canal.deployer.CanalLauncher - ## Something goes wrong when starting up the canal Server:
+com.alibaba.otter.canal.common.CanalException: load manager config failed.
+Caused by: java.lang.RuntimeException: requestGet remote error, request : http://canal-admin:8089/api/v1/config/server_polling?ip=172.28.0.9&port=11110&md5=&register=1&cluster=cluster&name=
+	at com.alibaba.otter.canal.instance.manager.plain.HttpHelper.get(HttpHelper.java:100) ~[canal.instance.manager-1.1.5.jar:na]
+	at com.alibaba.otter.canal.instance.manager.plain.PlainCanalConfigClient.doQuery(PlainCanalConfigClient.java:121) ~[canal.instance.manager-1.1.5.jar:na]
+	at com.alibaba.otter.canal.instance.manager.plain.PlainCanalConfigClient.queryConfig(PlainCanalConfigClient.java:110) ~[canal.instance.manager-1.1.5.jar:na]
+	at com.alibaba.otter.canal.instance.manager.plain.PlainCanalConfigClient.findServer(PlainCanalConfigClient.java:77) ~[canal.instance.manager-1.1.5.jar:na]
+	at com.alibaba.otter.canal.deployer.CanalLauncher.main(CanalLauncher.java:71) ~[canal.deployer-1.1.5.jar:na]
+Caused by: org.apache.http.conn.HttpHostConnectException: Connect to canal-admin:8089 [canal-admin/172.28.0.3] failed: Connection refused (Connection refused)
+	at org.apache.http.impl.conn.DefaultHttpClientConnectionOperator.connect(DefaultHttpClientConnectionOperator.java:151) ~[httpclient-4.5.1.jar:4.5.1]
+	at org.apache.http.impl.conn.PoolingHttpClientConnectionManager.connect(PoolingHttpClientConnectionManager.java:353) ~[httpclient-4.5.1.jar:4.5.1]
+	at org.apache.http.impl.execchain.MainClientExec.establishRoute(MainClientExec.java:380) ~[httpclient-4.5.1.jar:4.5.1]
+	at org.apache.http.impl.execchain.MainClientExec.execute(MainClientExec.java:236) ~[httpclient-4.5.1.jar:4.5.1]
+	at org.apache.http.impl.execchain.ProtocolExec.execute(ProtocolExec.java:184) ~[httpclient-4.5.1.jar:4.5.1]
+	at org.apache.http.impl.execchain.RetryExec.execute(RetryExec.java:88) ~[httpclient-4.5.1.jar:4.5.1]
+	at org.apache.http.impl.execchain.RedirectExec.execute(RedirectExec.java:110) ~[httpclient-4.5.1.jar:4.5.1]
+	at org.apache.http.impl.client.InternalHttpClient.doExecute(InternalHttpClient.java:184) ~[httpclient-4.5.1.jar:4.5.1]
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:82) ~[httpclient-4.5.1.jar:4.5.1]
+	at com.alibaba.otter.canal.instance.manager.plain.HttpHelper.get(HttpHelper.java:90) ~[canal.instance.manager-1.1.5.jar:na]
+	... 4 common frames omitted
+Caused by: java.net.ConnectException: Connection refused (Connection refused)
+	at java.net.PlainSocketImpl.socketConnect(Native Method) ~[na:1.8.0_181]
+	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:350) ~[na:1.8.0_181]
+	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:206) ~[na:1.8.0_181]
+	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:188) ~[na:1.8.0_181]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392) ~[na:1.8.0_181]
+	at java.net.Socket.connect(Socket.java:589) ~[na:1.8.0_181]
+	at org.apache.http.conn.socket.PlainConnectionSocketFactory.connectSocket(PlainConnectionSocketFactory.java:74) ~[httpclient-4.5.1.jar:4.5.1]
+	at org.apache.http.impl.conn.DefaultHttpClientConnectionOperator.connect(DefaultHttpClientConnectionOperator.java:134) ~[httpclient-4.5.1.jar:4.5.1]
+	... 13 common frames omitted
+2022-03-05 23:30:36.947 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## set default uncaught exception handler
+2022-03-05 23:30:36.984 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## load canal configurations
+2022-03-05 23:30:37.689 [main] ERROR com.alibaba.otter.canal.deployer.CanalLauncher - ## Something goes wrong when starting up the canal Server:
+com.alibaba.otter.canal.common.CanalException: load manager config failed.
+Caused by: com.alibaba.otter.canal.common.CanalException: requestGet for canal config error: auth :admin is failed
+2022-03-05 23:31:59.829 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## set default uncaught exception handler
+2022-03-05 23:31:59.888 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## load canal configurations
+2022-03-05 23:32:00.670 [main] ERROR com.alibaba.otter.canal.deployer.CanalLauncher - ## Something goes wrong when starting up the canal Server:
+com.alibaba.otter.canal.common.CanalException: load manager config failed.
+Caused by: com.alibaba.otter.canal.common.CanalException: requestGet for canal config error: auth :admin is failed
+2022-03-05 23:39:21.728 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## set default uncaught exception handler
+2022-03-05 23:39:21.867 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## load canal configurations
+2022-03-05 23:39:23.023 [main] ERROR com.alibaba.otter.canal.deployer.CanalLauncher - ## Something goes wrong when starting up the canal Server:
+com.alibaba.otter.canal.common.CanalException: load manager config failed.
+Caused by: com.alibaba.otter.canal.common.CanalException: requestGet for canal config error: auth :admin is failed
+2022-03-05 23:40:41.517 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## set default uncaught exception handler
+2022-03-05 23:40:41.614 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## load canal configurations
+2022-03-05 23:40:42.693 [main] ERROR com.alibaba.otter.canal.deployer.CanalLauncher - ## Something goes wrong when starting up the canal Server:
+com.alibaba.otter.canal.common.CanalException: load manager config failed.
+Caused by: com.alibaba.otter.canal.common.CanalException: requestGet for canal config error: auth :admin is failed
